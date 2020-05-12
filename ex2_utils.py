@@ -30,18 +30,17 @@ def conv1D(inSignal:np.ndarray,kernel1:np.ndarray)->np.ndarray:
 """
 def conv2D(inImage:np.ndarray,kernel2:np.ndarray)->np.ndarray:
 
-    flip = kernel2[-1::-1, -1::-1]  # ?
+    # flip = kernel2[-1::-1, -1::-1]  # ?
+    flip = np.transpose(np.transpose(kernel2))
     res = np.zeros(inImage.shape)
-    pad_width = np.floor(kernel2.shape[0] / 2)  # assume that the kernel is square
+    pad_width = np.floor(kernel2.shape[0] / 2).astype(int)  # assume that the kernel is square
     if pad_width < 1: pad_width = 1
     padding_img = np.pad(inImage, 1, mode='constant')  # zero padding to the image
-    print("************************************")
-    print(padding_img)
 
     for i in range(padding_img.shape[0] - pad_width):
         for j in range(padding_img.shape[1] - pad_width):
-            signal_part = padding_img[i:i+pad_width+1, j:j+pad_width+1]  # size of the kernel
-            print(signal_part)
+            signal_part = padding_img[i:i+pad_width+2, j:j+pad_width+2]  # size of the kernel
+            if signal_part.shape != flip.shape: print(i, j)
             res[i, j] = np.sum(np.multiply(signal_part, flip))
 
     return res

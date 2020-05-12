@@ -22,19 +22,14 @@ def test_conv1D():
 
 
 def test_conv2D():
-    signal = np.array([[1.0, 2, 3, 7],
-                       [4, 5, 6, 8],
-                       [7, 8, 9, 11]])
-    kernel = np.array([[1, 1, 1],
-                       [1, 1, 1],
-                       [1, 1, 1]])
-    cv2.imwrite("signal2D.png", signal)
-    signal2D = cv2.imread("signal2D.png")
-    print(signal2D)
-    their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
-    # print("their:\n", their)
+    signal2D = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
+    kernel = np.array([[1/9, 1/9, 1/9],
+              [1/9, 1/9, 1/9],
+              [1/9, 1/9, 1/9]])
+    #their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
+    #print("their:\n", their)
     mine = conv2D(signal2D, kernel)
-    # print("mine:\n", mine)
+    print("mine:\n", mine)
 
 
 def main():
