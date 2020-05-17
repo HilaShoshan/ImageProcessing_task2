@@ -65,11 +65,33 @@ def find_pad_width(kernel:np.ndarray) -> (int, int):
 
 
 """
+    Blur an image using a Gaussian kernel
+    :param inImage: Input image
+    :param kernelSize: Kernel size
+    :return: The Blurred image
+"""
+def blurImage1(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
+    pass
+
+
+"""
+    Blur an image using a Gaussian kernel using OpenCV built-in functions
+    :param inImage: Input image
+    :param kernelSize: Kernel size
+    :return: The Blurred image
+"""
+def blurImage2(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
+    kernel = cv2.getGaussianKernel(kernel_size)
+    pass
+
+
+"""
     Calculate gradient of an image
     :param inImage: Grayscale iamge
     :return: (directions, magnitude,x_der,y_der)
 """
 def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.ndarray):
+    inImage = cv2.GaussianBlur(inImage, (5, 5), 1)
     kernel_x = np.array([1, 0, -1]).reshape((1, 3))
     kernel_y = kernel_x.reshape((3, 1))
     im_derive_x = cv2.filter2D(inImage, -1, kernel_x, borderType=cv2.BORDER_REPLICATE)
@@ -121,14 +143,58 @@ def cv2_sobel(img: np.ndarray, thresh: float) -> np.ndarray:
     :param I: Input image
     :return: Edge matrix
 """
-def edgeDetectionZeroCrossingLOG(img:np.ndarray)->(np.ndarray):
-    # smoothing with 2D Gaussian
-    gaussian = np.array([[1, 2, 1],
-                        [2, 4, 2],
-                        [1, 2, 1]]) * (1/16)
-    smooth = cv2.filter2D(img, -1, gaussian, borderType=cv2.BORDER_REPLICATE)
-    plt.imshow(smooth)
-    plt.show()
+def edgeDetectionZeroCrossingLOG(img:np.ndarray) -> (np.ndarray):
+    # smoothing with 2D Gaussian filter
+    smooth = cv2.GaussianBlur(img, (5, 5), 1)
+    # convolve the smoothed image with the Laplacian filter
+    laplacian = np.array([[0, 1, 0],
+                          [1, -4, 1],
+                          [0, 1, 0]])
+    lap_img = cv2.filter2D(smooth, -1, laplacian, borderType=cv2.BORDER_REPLICATE)
+    ans = zeroCrossing(lap_img)  # a binary image (0,1) that representing the edges
+    return ans
+    pass
+
+
+# function that should find edges in the given image (second derivative)
+# looking for {+,-} or {+,0,-}
+
+def zeroCrossing(img:np.ndarray) -> np.ndarray:
+    ans = np.zeros(img.shape)
+    row = col = 1  # starting the loop from (1,1) pixel
+    pairs_list = [None] * 8  # list all the couples of the current pixel (those around it, in the 8 directions)
+    while row < img.shape[0] - 1:
+        while col < img.shape[1] - 1:
+            pairs_list.append(img[row - 1][col])  # up
+            pairs_list.append(img[row - 1][col + 1])  # top right diagonal            7  0  1
+            pairs_list.append(img[row][col + 1])  # right                              \ | /
+            pairs_list.append(img[row + 1][col + 1])  # lower right diagonal         6 - * - 2
+            pairs_list.append(img[row + 1][col])  # down                               / | \
+            pairs_list.append(img[row + 1][col - 1])  # lower left diagonal           5  4   3
+            pairs_list.append(img[row][col - 1])  # left
+            pairs_list.append(img[row - 1][col - 1])  # top left diagonal
+            ans = find_edges(img[row][col], ans, pairs_list, row, col)
+    return ans
+    pass
+
+
+def find_edges(pixel:float, ans:np.ndarray, pairs_list:list, row:int, col:int) -> np.ndarray:
+    print(pixel)
+    if pixel < 0:
+        if sum(n > 0 for n in pairs_list) > 0:  # there is at least one positive number around
+            ans[row][col] = 1
+        # elif sum(n == 0 for n in pairs_list) > 0:
+    elif pixel > 0:
+        if sum(n < 0 for n in pairs_list) > 0:  # there is at least one negative number around
+            ans[row][col] = 1
+        # elif sum(n == 0 for n in pairs_list) > 0:
+    else:  # pixel == 0
+        if any(pairs_list[0] < 0 and pairs_list[4] > 0, pairs_list[0] > 0 and pairs_list[4] < 0,
+            pairs_list[1] < 0 and pairs_list[5] > 0, pairs_list[1] > 0 and pairs_list[5] < 0,
+            pairs_list[2] < 0 and pairs_list[6] > 0, pairs_list[2] > 0 and pairs_list[6] < 0,
+            pairs_list[3] < 0 and pairs_list[7] > 0, pairs_list[3] > 0 and pairs_list[7] < 0):
+            ans[row][col] = 1
+    return ans
     pass
 
 
@@ -140,4 +206,20 @@ def edgeDetectionZeroCrossingLOG(img:np.ndarray)->(np.ndarray):
     :return: opencv solution, my implementation
 """
 def edgeDetectionCanny(img: np.ndarray, thrs_1: float, thrs_2: float) -> (np.ndarray, np.ndarray):
+    pass
+
+
+"""
+    Find Circles in an image using a Hough Transform algorithm extension
+    :param I: Input image
+    :param minRadius: Minimum circle radius
+    :param maxRadius: Maximum circle radius
+    :return: A list containing the detected circles,
+    [(x,y,radius),(x,y,radius),...]
+"""
+def houghCircle(img:np.ndarray, min_radius:float, max_radius:float) -> list:
+    if min_radius <= 0 or max_radius <= 0 or min_radius >= max_radius:
+        print("There is some problem with the given radius values")
+        return []
+
     pass

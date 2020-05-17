@@ -61,10 +61,13 @@ def test_edgeDetectionSobel():
 
 
 def test_edgeDetectionZeroCrossingLOG():
-    img = cv2.imread("codeMonkey.jpeg")
+    img = cv2.imread("boxman.jpg", cv2.IMREAD_GRAYSCALE)
+    plt.gray()
     plt.imshow(img)
     plt.show()
-    edgeDetectionZeroCrossingLOG(img)
+    ans = edgeDetectionZeroCrossingLOG(img)
+    plt.imshow(ans)
+    plt.show()
 
 
 def main():
