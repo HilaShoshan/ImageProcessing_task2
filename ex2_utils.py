@@ -165,35 +165,40 @@ def zeroCrossing(img:np.ndarray) -> np.ndarray:
     pairs_list = [None] * 8  # list all the couples of the current pixel (those around it, in the 8 directions)
     while row < img.shape[0] - 1:
         while col < img.shape[1] - 1:
-            pairs_list.append(img[row - 1][col])  # up
-            pairs_list.append(img[row - 1][col + 1])  # top right diagonal            7  0  1
-            pairs_list.append(img[row][col + 1])  # right                              \ | /
-            pairs_list.append(img[row + 1][col + 1])  # lower right diagonal         6 - * - 2
-            pairs_list.append(img[row + 1][col])  # down                               / | \
-            pairs_list.append(img[row + 1][col - 1])  # lower left diagonal           5  4   3
-            pairs_list.append(img[row][col - 1])  # left
-            pairs_list.append(img[row - 1][col - 1])  # top left diagonal
+            pairs_list[0] = img[row - 1][col]  # up
+            pairs_list[1] = img[row - 1][col + 1]  # top right diagonal            7  0  1
+            pairs_list[2] = img[row][col + 1]  # right                              \ | /
+            pairs_list[3] = img[row + 1][col + 1]  # lower right diagonal         6 - * - 2
+            pairs_list[4] = img[row + 1][col]  # down                               / | \
+            pairs_list[5] = img[row + 1][col - 1]  # lower left diagonal           5  4   3
+            pairs_list[6] = img[row][col - 1]  # left
+            pairs_list[7] = img[row - 1][col - 1]  # top left diagonal
             ans = find_edges(img[row][col], ans, pairs_list, row, col)
+            col += 2
+        row += 2
     return ans
     pass
 
 
 def find_edges(pixel:float, ans:np.ndarray, pairs_list:list, row:int, col:int) -> np.ndarray:
-    print(pixel)
     if pixel < 0:
-        if sum(n > 0 for n in pairs_list) > 0:  # there is at least one positive number around
+        if sum(1 for n in pairs_list if n > 0) > 0:  # there is at least one positive number around
             ans[row][col] = 1
+            print("*")
         # elif sum(n == 0 for n in pairs_list) > 0:
     elif pixel > 0:
-        if sum(n < 0 for n in pairs_list) > 0:  # there is at least one negative number around
+        if sum(1 for n in pairs_list if n < 0) > 0:  # there is at least one negative number around
             ans[row][col] = 1
+            print("**")
         # elif sum(n == 0 for n in pairs_list) > 0:
     else:  # pixel == 0
-        if any(pairs_list[0] < 0 and pairs_list[4] > 0, pairs_list[0] > 0 and pairs_list[4] < 0,
+        comp_list = [pairs_list[0] < 0 and pairs_list[4] > 0, pairs_list[0] > 0 and pairs_list[4] < 0,
             pairs_list[1] < 0 and pairs_list[5] > 0, pairs_list[1] > 0 and pairs_list[5] < 0,
             pairs_list[2] < 0 and pairs_list[6] > 0, pairs_list[2] > 0 and pairs_list[6] < 0,
-            pairs_list[3] < 0 and pairs_list[7] > 0, pairs_list[3] > 0 and pairs_list[7] < 0):
+            pairs_list[3] < 0 and pairs_list[7] > 0, pairs_list[3] > 0 and pairs_list[7] < 0]
+        if any(comp_list):
             ans[row][col] = 1
+            print("***")
     return ans
     pass
 
