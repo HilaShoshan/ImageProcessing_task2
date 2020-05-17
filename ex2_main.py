@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 from ex2_utils import *
 
 
@@ -23,17 +24,51 @@ def test_conv1D():
 
 def test_conv2D():
     signal2D = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
-    kernel = np.array([[1/9, 1/9, 1/9],
-              [1/9, 1/9, 1/9],
-              [1/9, 1/9, 1/9]])
-    #their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
-    #print("their:\n", their)
+    kernel = np.array([[1/9, 1/9, 1/9, 1/9, 1/9],
+                        [1/9, 1/9, 1/9, 1/9, 1/9],
+                        [1/9, 1/9, 1/9, 1/9, 1/9],
+                        [1/9, 1/9, 1/9, 1/9, 1/9],
+                        [1/9, 1/9, 1/9, 1/9, 1/9]])
+    print("signal:\n", signal2D)
+    their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
+    print("their:\n", their)
     mine = conv2D(signal2D, kernel)
     print("mine:\n", mine)
+    plt.gray()
+    plt.imshow(their)
+    plt.show()
+    plt.imshow(mine)
+    plt.show()
+
+
+def test_convDerivative():
+    img = cv2.imread("boxman.jpg")
+    convDerivative(img)
+
+
+def test_edgeDetectionSobel():
+    img = cv2.imread("codeMonkey.jpeg")
+    their, mine = edgeDetectionSobel(img, 0.3)
+
+    plt.subplot(2, 2, 1), plt.imshow(img)
+    plt.title('Original'), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 2, 3), plt.imshow(their)
+    plt.title('their'), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 2, 4), plt.imshow(mine)
+    plt.title('mine'), plt.xticks([]), plt.yticks([])
+
+    plt.show()
+
+
+def test_edgeDetectionZeroCrossingLOG():
+    img = cv2.imread("codeMonkey.jpeg")
+    plt.imshow(img)
+    plt.show()
+    edgeDetectionZeroCrossingLOG(img)
 
 
 def main():
-    test_conv2D()
+    test_edgeDetectionZeroCrossingLOG()
 
 
 if __name__ == '__main__':
