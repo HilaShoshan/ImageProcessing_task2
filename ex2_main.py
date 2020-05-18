@@ -18,17 +18,14 @@ def test() -> np.ndarray:
 def test_conv1D():
     signal = np.array([1, 2, 3, 7, 8])
     kernel = np.array([0, 1, 0.5])
-    print(np.convolve(signal, kernel, "full"))
-    print(conv1D(signal, kernel))
+    print("numpy: ", np.convolve(signal, kernel, "full"))
+    print("mine: ", conv1D(signal, kernel))
 
 
 def test_conv2D():
     signal2D = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
-    kernel = np.array([[1/9, 1/9, 1/9, 1/9, 1/9],
-                        [1/9, 1/9, 1/9, 1/9, 1/9],
-                        [1/9, 1/9, 1/9, 1/9, 1/9],
-                        [1/9, 1/9, 1/9, 1/9, 1/9],
-                        [1/9, 1/9, 1/9, 1/9, 1/9]])
+    kernel = np.ones(shape=(5, 5))*(1/9)
+    print(kernel)
     print("signal:\n", signal2D)
     their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
     print("their:\n", their)
@@ -43,7 +40,11 @@ def test_conv2D():
 
 def test_convDerivative():
     img = cv2.imread("boxman.jpg")
-    convDerivative(img)
+    directions, magnitude, im_derive_x, im_derive_y = convDerivative(img)
+    plt.imshow(im_derive_x)
+    plt.show()
+    plt.imshow(im_derive_y)
+    plt.show()
 
 
 def test_edgeDetectionSobel():
@@ -71,7 +72,13 @@ def test_edgeDetectionZeroCrossingLOG():
 
 
 def main():
-    test_edgeDetectionZeroCrossingLOG()
+    test_conv1D()
+    # test_conv2D()
+    test_convDerivative()
+    # test_edgeDetectionSobel()
+    # test_edgeDetectionZeroCrossingLOG()
+    # canny
+    # hough
 
 
 if __name__ == '__main__':

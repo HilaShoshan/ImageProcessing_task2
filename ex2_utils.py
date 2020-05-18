@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 
-"""
+""" 1.1
     Convolve a 1-D array with a given kernel
     :param inSignal: 1-D array
     :param kernel1: 1-D array as a kernel
@@ -24,7 +24,7 @@ def conv1D(inSignal:np.ndarray,kernel1:np.ndarray)->np.ndarray:
     pass
 
 
-"""
+""" 1.2
     Convolve a 2-D array with a given kernel
     :param inImage: 2D image
     :param kernel2: A kernel
@@ -64,7 +64,24 @@ def find_pad_width(kernel:np.ndarray) -> (int, int):
     pass
 
 
+""" 2.1
+    Calculate gradient of an image
+    :param inImage: Grayscale iamge
+    :return: (directions, magnitude,x_der,y_der)
 """
+def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.ndarray):
+    inImage = cv2.GaussianBlur(inImage, (5, 5), 1)
+    kernel_x = np.array([1, 0, -1]).reshape((1, 3))
+    kernel_y = kernel_x.reshape((3, 1))
+    im_derive_x = cv2.filter2D(inImage, -1, kernel_x, borderType=cv2.BORDER_REPLICATE)
+    im_derive_y = cv2.filter2D(inImage, -1, kernel_y, borderType=cv2.BORDER_REPLICATE)
+    magnitude = np.sqrt(np.square(im_derive_x) + np.square(im_derive_y))
+    directions = np.arctan(np.divide(im_derive_y, im_derive_x))
+    return directions, magnitude, im_derive_x, im_derive_y
+    pass
+
+
+""" 2.2
     Blur an image using a Gaussian kernel
     :param inImage: Input image
     :param kernelSize: Kernel size
@@ -85,24 +102,7 @@ def blurImage2(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
     pass
 
 
-"""
-    Calculate gradient of an image
-    :param inImage: Grayscale iamge
-    :return: (directions, magnitude,x_der,y_der)
-"""
-def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.ndarray):
-    inImage = cv2.GaussianBlur(inImage, (5, 5), 1)
-    kernel_x = np.array([1, 0, -1]).reshape((1, 3))
-    kernel_y = kernel_x.reshape((3, 1))
-    im_derive_x = cv2.filter2D(inImage, -1, kernel_x, borderType=cv2.BORDER_REPLICATE)
-    im_derive_y = cv2.filter2D(inImage, -1, kernel_y, borderType=cv2.BORDER_REPLICATE)
-    magnitude = np.sqrt(np.square(im_derive_x) + np.square(im_derive_y))
-    directions = np.arctan(np.divide(im_derive_y, im_derive_x))
-    return directions, magnitude, im_derive_x, im_derive_y
-    pass
-
-
-"""
+""" 3.1
     Detects edges using the Sobel method
     :param img: Input image
     :param thresh: The minimum threshold for the edge response
@@ -138,7 +138,7 @@ def cv2_sobel(img: np.ndarray, thresh: float) -> np.ndarray:
     pass
 
 
-"""
+""" 3.2
     Detecting edges using the "ZeroCrossingLOG" method
     :param I: Input image
     :return: Edge matrix
@@ -162,7 +162,7 @@ def edgeDetectionZeroCrossingLOG(img:np.ndarray) -> (np.ndarray):
 def zeroCrossing(img:np.ndarray) -> np.ndarray:
     ans = np.zeros(img.shape)
     row = col = 1  # starting the loop from (1,1) pixel
-    pairs_list = [None] * 8  # list all the couples of the current pixel (those around it, in the 8 directions)
+    pairs_list = np.zeros(8)  # list of all the couples of the current pixel (those around it, in the 8 directions)
     while row < img.shape[0] - 1:
         while col < img.shape[1] - 1:
             pairs_list[0] = img[row - 1][col]  # up
@@ -173,24 +173,28 @@ def zeroCrossing(img:np.ndarray) -> np.ndarray:
             pairs_list[5] = img[row + 1][col - 1]  # lower left diagonal           5  4   3
             pairs_list[6] = img[row][col - 1]  # left
             pairs_list[7] = img[row - 1][col - 1]  # top left diagonal
-            ans = find_edges(img[row][col], ans, pairs_list, row, col)
+            ans = find_edges(img, ans, pairs_list, row, col)  # update ans
             col += 2
         row += 2
     return ans
     pass
 
 
-def find_edges(pixel:float, ans:np.ndarray, pairs_list:list, row:int, col:int) -> np.ndarray:
+def find_edges(img:np.ndarray, ans:np.ndarray, pairs_list:np.ndarray, row:int, col:int) -> np.ndarray:
+    pixel = img[row][col]
+    posIndx = np.where(pairs_list > 0)[0]  # array representing where there are positive elements
+    zerosIndx = np.where(pairs_list == 0)[0]  # all the indexes that there are zeros
+    numNeg = pairs_list.size - posIndx.size - zerosIndx.size
     if pixel < 0:
-        if sum(1 for n in pairs_list if n > 0) > 0:  # there is at least one positive number around
+        if posIndx.size > 0:  # there is at least one positive number around
             ans[row][col] = 1
-            print("*")
-        # elif sum(n == 0 for n in pairs_list) > 0:
+        if zerosIndx.size > 0:
+            for i in range(zerosIndx.size): zero_neighbor(i, col, row, img)
     elif pixel > 0:
-        if sum(1 for n in pairs_list if n < 0) > 0:  # there is at least one negative number around
+        if numNeg > 0:  # there is at least one negative number around
             ans[row][col] = 1
-            print("**")
-        # elif sum(n == 0 for n in pairs_list) > 0:
+        if zerosIndx.size > 0:
+            for i in range(zerosIndx.size): zero_neighbor(i, col, row, img)
     else:  # pixel == 0
         comp_list = [pairs_list[0] < 0 and pairs_list[4] > 0, pairs_list[0] > 0 and pairs_list[4] < 0,
             pairs_list[1] < 0 and pairs_list[5] > 0, pairs_list[1] > 0 and pairs_list[5] < 0,
@@ -198,12 +202,15 @@ def find_edges(pixel:float, ans:np.ndarray, pairs_list:list, row:int, col:int) -
             pairs_list[3] < 0 and pairs_list[7] > 0, pairs_list[3] > 0 and pairs_list[7] < 0]
         if any(comp_list):
             ans[row][col] = 1
-            print("***")
     return ans
     pass
 
 
-"""
+def zero_neighbor(i:int, col:int, row:int, img:np.ndarray):
+    pass
+
+
+""" 3.3
     Detecting edges usint "Canny Edge" method
     :param img: Input image
     :param thrs_1: T1
@@ -214,7 +221,7 @@ def edgeDetectionCanny(img: np.ndarray, thrs_1: float, thrs_2: float) -> (np.nda
     pass
 
 
-"""
+""" 4
     Find Circles in an image using a Hough Transform algorithm extension
     :param I: Input image
     :param minRadius: Minimum circle radius
