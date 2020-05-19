@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 
 
 """ 1.1
@@ -21,7 +20,6 @@ def conv1D(inSignal:np.ndarray,kernel1:np.ndarray)->np.ndarray:
         res[i] = np.dot(new_signal[i : i+num_of_zeros+1], flip)
 
     return res
-    pass
 
 
 """ 1.2
@@ -49,7 +47,6 @@ def conv2D(inImage:np.ndarray,kernel2:np.ndarray)->np.ndarray:
             res[from_i, from_j] = np.sum(np.multiply(signal_part, flip))
 
     return res
-    pass
 
 
 # function to determine the pad width in each axis
@@ -61,7 +58,6 @@ def find_pad_width(kernel:np.ndarray) -> (int, int):
     y_width = np.floor(kernel.shape[1] / 2).astype(int)
     if y_width < 1: y_width = 1
     return x_width, y_width
-    pass
 
 
 """ 2.1
@@ -75,10 +71,10 @@ def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.n
     kernel_y = kernel_x.reshape((3, 1))
     im_derive_x = cv2.filter2D(inImage, -1, kernel_x, borderType=cv2.BORDER_REPLICATE)
     im_derive_y = cv2.filter2D(inImage, -1, kernel_y, borderType=cv2.BORDER_REPLICATE)
-    magnitude = np.sqrt(np.square(im_derive_x) + np.square(im_derive_y))
-    directions = np.arctan(np.divide(im_derive_y, im_derive_x))
+    magnitude = np.sqrt(np.square(im_derive_x) + np.square(im_derive_y)).astype('uint8')
+    directions = np.arctan2(im_derive_y, im_derive_x) * 180 / np.pi
+    directions = directions.astype('int')  # ??
     return directions, magnitude, im_derive_x, im_derive_y
-    pass
 
 
 """ 2.2
@@ -122,18 +118,16 @@ def edgeDetectionSobel(img: np.ndarray, thresh: float = 0.7) -> (np.ndarray, np.
     mine = np.zeros(img.shape)
     mine[magnitude >= thresh] = 1
     return their, mine
-    pass
 
 
 def cv2_sobel(img: np.ndarray, thresh: float) -> np.ndarray:
-    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)  # x
-    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)  # y
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)  # x
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)  # y
     magnitude = cv2.magnitude(sobelx, sobely)
     ans = np.zeros(img.shape)
     ans[magnitude >= thresh] = 1
     # laplacian = cv2.Laplacian
     return ans
-    pass
 
 
 """ 3.2
@@ -151,7 +145,6 @@ def edgeDetectionZeroCrossingLOG(img:np.ndarray) -> (np.ndarray):
     lap_img = cv2.filter2D(smooth, -1, laplacian, borderType=cv2.BORDER_REPLICATE)
     ans = zeroCrossing(lap_img)  # a binary image (0,1) that representing the edges
     return ans
-    pass
 
 
 # function that should find edges in the given image (second derivative)
@@ -175,7 +168,6 @@ def zeroCrossing(img:np.ndarray) -> np.ndarray:
             col += 2
         row += 2
     return ans
-    pass
 
 
 def find_edges(img:np.ndarray, ans:np.ndarray, pairs_list:np.ndarray, row:int, col:int) -> np.ndarray:
@@ -201,7 +193,6 @@ def find_edges(img:np.ndarray, ans:np.ndarray, pairs_list:np.ndarray, row:int, c
         if any(comp_list):
             ans[row][col] = 1
     return ans
-    pass
 
 
 def zero_neighbor(i:int, col:int, row:int, img:np.ndarray):

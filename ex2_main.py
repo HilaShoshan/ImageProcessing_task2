@@ -1,18 +1,5 @@
-import numpy as np
-import cv2
-import matplotlib.pyplot as plt
 from ex2_utils import *
-
-
-def test() -> np.ndarray:
-    a = np.arange(9)
-    print("a: ", a)
-    b = np.ones(9)
-    print("b: ", b)
-    c = np.dot(a, b)
-    print("c: ", c.shape, c)
-    return c
-    pass
+import matplotlib.pyplot as plt
 
 
 def test_conv1D():
@@ -23,14 +10,10 @@ def test_conv1D():
 
 
 def test_conv2D():
-    signal2D = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
+    signal2D = cv2.imread("coins.jpg", cv2.IMREAD_GRAYSCALE)
     kernel = np.ones(shape=(5, 5))*(1/25)
-    print(kernel)
-    print("signal:\n", signal2D)
     their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
-    print("their:\n", their)
     mine = conv2D(signal2D, kernel)
-    print("mine:\n", mine)
     plt.gray()
     plt.imshow(their)
     plt.show()
@@ -41,19 +24,27 @@ def test_conv2D():
 def test_convDerivative():
     img = cv2.imread("boxman.jpg", cv2.IMREAD_GRAYSCALE)
     directions, magnitude, im_derive_x, im_derive_y = convDerivative(img)
+
     plt.gray()
-    plt.imshow(im_derive_x)
+    plt.subplot(2, 2, 1), plt.imshow(img)
+    plt.title('Original'), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 2, 2), plt.imshow(magnitude)
+    plt.title('Magnitude'), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 2, 3), plt.imshow(im_derive_x)
+    plt.title('Derivative X'), plt.xticks([]), plt.yticks([])
+    plt.subplot(2, 2, 4), plt.imshow(im_derive_y)
+    plt.title('Derivative Y'), plt.xticks([]), plt.yticks([])
     plt.show()
-    plt.imshow(im_derive_y)
+
+    print(directions)
+
+    plt.imshow(directions)
     plt.show()
 
 
 def test_edgeDetectionSobel():
     img = cv2.imread("codeMonkey.jpeg", cv2.IMREAD_GRAYSCALE)
     their, mine = edgeDetectionSobel(img, 0.3)
-
-    print(their)
-    print(mine)
 
     plt.gray()
 
@@ -81,8 +72,8 @@ def main():
     # test_conv1D()
     # test_conv2D()
     # test_convDerivative()
-    test_edgeDetectionSobel()
-    # test_edgeDetectionZeroCrossingLOG()
+    # test_edgeDetectionSobel()
+    test_edgeDetectionZeroCrossingLOG()
     # canny
     # hough
 
