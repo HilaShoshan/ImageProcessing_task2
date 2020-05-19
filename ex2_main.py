@@ -24,7 +24,7 @@ def test_conv1D():
 
 def test_conv2D():
     signal2D = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
-    kernel = np.ones(shape=(5, 5))*(1/9)
+    kernel = np.ones(shape=(5, 5))*(1/25)
     print(kernel)
     print("signal:\n", signal2D)
     their = cv2.filter2D(signal2D, -1, kernel, borderType=cv2.BORDER_REPLICATE)
@@ -39,8 +39,9 @@ def test_conv2D():
 
 
 def test_convDerivative():
-    img = cv2.imread("boxman.jpg")
+    img = cv2.imread("boxman.jpg", cv2.IMREAD_GRAYSCALE)
     directions, magnitude, im_derive_x, im_derive_y = convDerivative(img)
+    plt.gray()
     plt.imshow(im_derive_x)
     plt.show()
     plt.imshow(im_derive_y)
@@ -48,8 +49,13 @@ def test_convDerivative():
 
 
 def test_edgeDetectionSobel():
-    img = cv2.imread("codeMonkey.jpeg")
+    img = cv2.imread("codeMonkey.jpeg", cv2.IMREAD_GRAYSCALE)
     their, mine = edgeDetectionSobel(img, 0.3)
+
+    print(their)
+    print(mine)
+
+    plt.gray()
 
     plt.subplot(2, 2, 1), plt.imshow(img)
     plt.title('Original'), plt.xticks([]), plt.yticks([])
@@ -72,10 +78,10 @@ def test_edgeDetectionZeroCrossingLOG():
 
 
 def main():
-    test_conv1D()
+    # test_conv1D()
     # test_conv2D()
-    test_convDerivative()
-    # test_edgeDetectionSobel()
+    # test_convDerivative()
+    test_edgeDetectionSobel()
     # test_edgeDetectionZeroCrossingLOG()
     # canny
     # hough

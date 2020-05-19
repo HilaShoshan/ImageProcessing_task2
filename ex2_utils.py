@@ -120,7 +120,6 @@ def edgeDetectionSobel(img: np.ndarray, thresh: float = 0.7) -> (np.ndarray, np.
     sobelY = cv2.filter2D(img, -1, Sy_kernel, borderType=cv2.BORDER_REPLICATE)
     magnitude = np.sqrt(np.square(sobelX) + np.square(sobelY))
     mine = np.zeros(img.shape)
-    mine[magnitude < thresh] = 0
     mine[magnitude >= thresh] = 1
     return their, mine
     pass
@@ -131,9 +130,8 @@ def cv2_sobel(img: np.ndarray, thresh: float) -> np.ndarray:
     sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=5)  # y
     magnitude = cv2.magnitude(sobelx, sobely)
     ans = np.zeros(img.shape)
-    ans[magnitude < thresh] = 0
     ans[magnitude >= thresh] = 1
-    # laplacian = cv2.Laplacian(img, cv2.CV_64F)
+    # laplacian = cv2.Laplacian
     return ans
     pass
 
