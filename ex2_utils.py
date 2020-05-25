@@ -73,7 +73,7 @@ def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.n
     im_derive_y = cv2.filter2D(inImage, -1, kernel_y, borderType=cv2.BORDER_REPLICATE)
     magnitude = np.sqrt(np.square(im_derive_x) + np.square(im_derive_y)).astype('uint8')
     directions = np.arctan2(im_derive_y, im_derive_x) * 180 / np.pi
-    directions = directions.astype('int')  # ??
+    # directions = directions.astype('int')  # ??
     return directions, magnitude, im_derive_x, im_derive_y
 
 
@@ -207,7 +207,73 @@ def zero_neighbor(i:int, col:int, row:int, img:np.ndarray):
     :return: opencv solution, my implementation
 """
 def edgeDetectionCanny(img: np.ndarray, thrs_1: float, thrs_2: float) -> (np.ndarray, np.ndarray):
-    pass
+    cv_sol = cv2.Canny(img, thrs_1, thrs_2)
+
+    # blur and compute the partial derivatives, magnitude and direction
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)  # x
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)  # y
+    magnitude = cv2.magnitude(sobelx, sobely)
+    directions = np.arctan2(sobelx, sobely)  # * 180 / np.pi
+
+    magnitude = magnitude / magnitude.max() * 255
+
+    # quantize the gradient directions
+    quant_dir = np.zeros(directions.shape)
+    quant_dir = quantGradientDirections(quant_dir, directions)
+
+    # perform non-maximum suppression
+    thin_edges = nonMaxSupression(magnitude, directions)  # or quant_dir ??
+
+    # find all edges
+    ans = np.zeros(img.shape)
+    # ans = hysteresis(ans)
+
+    return cv_sol, thin_edges
+
+
+# quantize the gradient directions to 4 parts
+def quantGradientDirections(img: np.ndarray, directions:np.ndarray) -> np.ndarray:
+    quant1 = np.logical_and(directions >= 0, directions < 45)
+    quant2 = np.logical_and(directions >= 45, directions < 90)
+    quant3 = np.logical_and(directions >= 90, directions < 135)
+    quant4 = np.logical_and(directions >= 135, directions <= 180)
+    img[directions in quant1] = 22.5
+    img[directions in quant2] = 67.5
+    img[directions in quant3] = 112.5
+    img[directions in quant4] = 157.5
+    img[img < 0] += 180  # ??
+    return img
+
+
+def nonMaxSupression(img: np.ndarray, D : np.ndarray) -> np.ndarray:
+    Z = np.zeros(img.shape, dtype=np.int32)
+    D[D < 0] += 180
+
+    for i in range(1, img.shape[0] - 1):
+        for j in range(1, img.shape[1] - 1):
+            q = 255
+            r = 255
+
+            if (0 <= D[i, j] < 22.5) or (157.5 <= D[i, j] <= 180):
+                q = img[i, j + 1]
+                r = img[i, j - 1]
+
+            elif (22.5 <= D[i, j] < 67.5):
+                q = img[i + 1, j - 1]
+                r = img[i - 1, j + 1]
+
+            elif (67.5 <= D[i, j] < 112.5):
+                q = img[i + 1, j]
+                r = img[i - 1, j]
+
+            elif (112.5 <= D[i, j] < 157.5):
+                q = img[i - 1, j - 1]
+                r = img[i + 1, j + 1]
+
+            if (img[i, j] >= q) and (img[i, j] >= r):
+                Z[i, j] = img[i, j]
+
+        return Z
 
 
 """ 4

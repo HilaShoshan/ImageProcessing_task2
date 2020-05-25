@@ -68,13 +68,23 @@ def test_edgeDetectionZeroCrossingLOG():
     plt.show()
 
 
+def test_edgeDetectionCanny():
+    img = cv2.imread("coins.jpg", cv2.IMREAD_GRAYSCALE)
+    plt.gray()
+    plt.imshow(img)
+    plt.show()
+    canny, mine = edgeDetectionCanny(img, 50, 200)
+    plt.imshow(mine)
+    plt.show()
+
+
 def main():
     # test_conv1D()
     # test_conv2D()
     # test_convDerivative()
     # test_edgeDetectionSobel()
-    test_edgeDetectionZeroCrossingLOG()
-    # canny
+    # test_edgeDetectionZeroCrossingLOG()
+    test_edgeDetectionCanny()
     # hough
 
 
