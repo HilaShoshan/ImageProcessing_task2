@@ -78,14 +78,19 @@ def test_edgeDetectionCanny():
     plt.show()
 
 
+def test_houghCircle():
+    img = cv2.imread("bubbles.jpg", cv2.IMREAD_GRAYSCALE)
+    houghCircle(img, 10, 20)
+
+
 def main():
     # test_conv1D()
     # test_conv2D()
     # test_convDerivative()
     # test_edgeDetectionSobel()
     # test_edgeDetectionZeroCrossingLOG()
-    test_edgeDetectionCanny()
-    # hough
+    # test_edgeDetectionCanny()
+    test_houghCircle()
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
 
 """ 1.1
@@ -288,5 +289,10 @@ def houghCircle(img:np.ndarray, min_radius:float, max_radius:float) -> list:
     if min_radius <= 0 or max_radius <= 0 or min_radius >= max_radius:
         print("There is some problem with the given radius values")
         return []
+    blur_img = cv2.GaussianBlur(img, (5, 5), 1)
+    edged_img = cv2.Canny(blur_img, 75, 150)
+    circles_list = list()  # the answer to return
 
-    pass
+    filter3D = np.ones((30, 30, 100))
+
+    return circles_list

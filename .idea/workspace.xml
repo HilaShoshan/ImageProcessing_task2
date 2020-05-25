@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e7306e70-65d1-4132-bfc1-2dd791d7b4e9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ex2_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex2_main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ex2_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex2_utils.py" afterDir="false" />
     </list>
@@ -13,7 +12,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/task2$ex2_main.coverage" NAME="ex2_main Coverage Results" MODIFIED="1590319706299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/task2$ex2_main.coverage" NAME="ex2_main Coverage Results" MODIFIED="1590428081920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -34,8 +33,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ex2_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="244">
-              <caret line="77" column="13" selection-start-line="77" selection-start-column="13" selection-end-line="77" selection-end-column="13" />
+            <state relative-caret-position="342">
+              <caret line="89" column="31" lean-forward="true" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -46,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ex2_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="215" column="53" lean-forward="true" selection-start-line="215" selection-start-column="53" selection-end-line="215" selection-end-column="53" />
+            <state relative-caret-position="179">
+              <caret line="288" column="54" lean-forward="true" selection-start-line="288" selection-start-column="54" selection-end-line="288" selection-end-column="54" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -190,23 +189,23 @@
       <workItem from="1589319847902" duration="100000" />
       <workItem from="1589319967558" duration="62921000" />
       <workItem from="1589889755563" duration="7798000" />
-      <workItem from="1590235542590" duration="20559000" />
+      <workItem from="1590235542590" duration="24259000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="114228000" />
+    <option name="totallyTimeSpent" value="117928000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.075642966" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1096823" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.21603929" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.109656304" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.31751227" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -215,12 +214,12 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3289689" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.14402619" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.09819967" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.29787233" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" id="SciView" order="3" visible="true" weight="0.22390318" />
+      <window_info active="true" anchor="right" id="SciView" order="3" visible="true" weight="0.25869894" />
       <window_info anchor="right" id="Database" order="4" weight="0.32980332" />
     </layout>
     <layout-to-restore>
@@ -292,8 +291,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ex2_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="77" column="13" selection-start-line="77" selection-start-column="13" selection-end-line="77" selection-end-column="13" />
+        <state relative-caret-position="342">
+          <caret line="89" column="31" lean-forward="true" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -302,8 +301,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ex2_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="215" column="53" lean-forward="true" selection-start-line="215" selection-start-column="53" selection-end-line="215" selection-end-column="53" />
+        <state relative-caret-position="179">
+          <caret line="288" column="54" lean-forward="true" selection-start-line="288" selection-start-column="54" selection-end-line="288" selection-end-column="54" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
