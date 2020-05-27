@@ -36,15 +36,11 @@ def test_convDerivative():
     plt.title('Derivative Y'), plt.xticks([]), plt.yticks([])
     plt.show()
 
-    print(directions)
-
-    plt.imshow(directions)
-    plt.show()
-
 
 def test_blurImage():
     img = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
-    blur = blurImage2(img)
+    kernel_size = np.array([10, 10])
+    blur = blurImage2(img, kernel_size)
     plt.gray()
     plt.imshow(img)
     plt.show()
@@ -90,17 +86,20 @@ def test_edgeDetectionCanny():
 
 
 def test_houghCircle():
-    img = cv2.imread("bubbles.jpg", cv2.IMREAD_GRAYSCALE)
-    houghCircle(img, 10, 20)
+    #img = cv2.imread("bubbles.jpg", cv2.IMREAD_GRAYSCALE)
+    #houghCircle(img, 10, 20)
+    print("houghCircle:\n I really tried... :(")
 
 
 def main():
-    # test_conv1D()
-    # test_conv2D()
-    # test_convDerivative()
-    # test_edgeDetectionSobel()
-    # test_edgeDetectionZeroCrossingLOG()
-    # test_edgeDetectionCanny()
+    print("my ID:\n207931106")
+    test_conv1D()
+    test_conv2D()
+    test_convDerivative()
+    test_blurImage()
+    test_edgeDetectionSobel()
+    test_edgeDetectionZeroCrossingLOG()
+    test_edgeDetectionCanny()
     test_houghCircle()
 
 

@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 
 
 """ 1.1
@@ -89,7 +88,7 @@ def blurImage1(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
     sigma = 0.3 * ((kernel_size[0] - 1) * 0.5 - 1) + 0.8
     for i in range(kernel_size[0]):
         for j in range(kernel_size[1]):
-            kernel[i, j] = ((1 / 2*np.pi) * np.e) - ((i**2 + j**2) / 2)
+            kernel[i][j] = ((1 / 2*np.pi*np.square(sigma)) * np.e) - ((i**2 + j**2) / 2*np.square(sigma))
     return conv2D(in_image, kernel)
 
 
@@ -100,7 +99,7 @@ def blurImage1(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
     :return: The Blurred image
 """
 def blurImage2(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
-    kernel = cv2.getGaussianKernel(kernel_size)
+    kernel = cv2.getGaussianKernel(kernel_size[0], 0)
     blur = cv2.filter2D(in_image, -1, kernel, borderType=cv2.BORDER_REPLICATE)
     return blur
 
@@ -343,6 +342,68 @@ def houghCircle(img:np.ndarray, min_radius:float, max_radius:float) -> list:
     edged_img = cv2.Canny(blur_img, 75, 150)
     circles_list = list()  # the answer to return
 
-    filter3D = np.ones((30, 30, 100))
+    height, width = edged_img.shape
+    radii = 100
+
+    output = img.copy()
+
+    acc_array = np.zeros((height, width, radii))
+
+    filter3D = np.ones((30, 30, radii))
+
+    edges = np.where(edged_img == 255)
+    for i in range(0, len(edges[0])):
+        x = edges[0][i]
+        y = edges[1][i]
+        for radius in range(20, 55):
+            fill_acc_array(x, y, radius, height, width, acc_array)
+
+    i = 0
+    j = 0
+    while (i < height - 30):
+        while (j < width - 30):
+            filter3D = acc_array[i:i + 30, j:j + 30, :] * filter3D
+            max_pt = np.where(filter3D == filter3D.max())
+            a = max_pt[0]
+            b = max_pt[1]
+            c = max_pt[2]
+            b = b + j
+            a = a + i
+            if (filter3D.max() > 90):
+                cv2.circle(output, (b, a), c, (0, 255, 0), 2)
+            j = j + 30
+            filter3D[:, :, :] = 1
+        j = 0
+        i = i + 30
 
     return circles_list
+
+
+def fill_acc_array(x0, y0, radius, height, width, acc_array):
+    x = radius
+    y = 0
+    decision = 1 - x
+
+    while (y < x):
+        if (x + x0 < height and y + y0 < width):
+            acc_array[x + x0, y + y0, radius] += 1;  # Octant 1
+        if (y + x0 < height and x + y0 < width):
+            acc_array[y + x0, x + y0, radius] += 1;  # Octant 2
+        if (-x + x0 < height and y + y0 < width):
+            acc_array[-x + x0, y + y0, radius] += 1;  # Octant 4
+        if (-y + x0 < height and x + y0 < width):
+            acc_array[-y + x0, x + y0, radius] += 1;  # Octant 3
+        if (-x + x0 < height and -y + y0 < width):
+            acc_array[-x + x0, -y + y0, radius] += 1;  # Octant 5
+        if (-y + x0 < height and -x + y0 < width):
+            acc_array[-y + x0, -x + y0, radius] += 1;  # Octant 6
+        if (x + x0 < height and -y + y0 < width):
+            acc_array[x + x0, -y + y0, radius] += 1;  # Octant 8
+        if (y + x0 < height and -x + y0 < width):
+            acc_array[y + x0, -x + y0, radius] += 1;  # Octant 7
+        y += 1
+        if (decision <= 0):
+            decision += 2 * y + 1
+        else:
+            x = x - 1;
+            decision += 2 * (y - x) + 1
