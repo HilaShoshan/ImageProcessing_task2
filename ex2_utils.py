@@ -85,7 +85,12 @@ def convDerivative(inImage:np.ndarray) -> (np.ndarray,np.ndarray,np.ndarray,np.n
     :return: The Blurred image
 """
 def blurImage1(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
-    pass
+    kernel = np.array(kernel_size)
+    sigma = 0.3 * ((kernel_size[0] - 1) * 0.5 - 1) + 0.8
+    for i in range(kernel_size[0]):
+        for j in range(kernel_size[1]):
+            kernel[i, j] = ((1 / 2*np.pi) * np.e) - ((i**2 + j**2) / 2)
+    return conv2D(in_image, kernel)
 
 
 """
@@ -96,7 +101,8 @@ def blurImage1(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
 """
 def blurImage2(in_image:np.ndarray,kernel_size:np.ndarray)->np.ndarray:
     kernel = cv2.getGaussianKernel(kernel_size)
-    pass
+    blur = cv2.filter2D(in_image, -1, kernel, borderType=cv2.BORDER_REPLICATE)
+    return blur
 
 
 """ 3.1
@@ -166,8 +172,8 @@ def zeroCrossing(img:np.ndarray) -> np.ndarray:
             pairs_list[6] = img[row][col - 1]  # left
             pairs_list[7] = img[row - 1][col - 1]  # top left diagonal
             ans = find_edges(img, ans, pairs_list, row, col)  # update ans
-            col += 2
-        row += 2
+            col += 1
+        row += 1
     return ans
 
 
@@ -176,28 +182,23 @@ def find_edges(img:np.ndarray, ans:np.ndarray, pairs_list:np.ndarray, row:int, c
     posIndx = np.where(pairs_list > 0)[0]  # array representing where there are positive elements
     zerosIndx = np.where(pairs_list == 0)[0]  # all the indexes that there are zeros
     numNeg = pairs_list.size - posIndx.size - zerosIndx.size
-    if pixel < 0:
+    if pixel < 0:  # {+,-}
         if posIndx.size > 0:  # there is at least one positive number around
-            ans[row][col] = 1
-        if zerosIndx.size > 0:
-            for i in range(zerosIndx.size): zero_neighbor(i, col, row, img)
-    elif pixel > 0:
+            ans[row][col] = 1.0
+            print("{+,-}")
+    elif pixel > 0:  # {-,+}
         if numNeg > 0:  # there is at least one negative number around
-            ans[row][col] = 1
-        if zerosIndx.size > 0:
-            for i in range(zerosIndx.size): zero_neighbor(i, col, row, img)
-    else:  # pixel == 0
+            ans[row][col] = 1.0
+            print("{-,+}")
+    else:  # pixel == 0, {+,0,-}
         comp_list = [pairs_list[0] < 0 and pairs_list[4] > 0, pairs_list[0] > 0 and pairs_list[4] < 0,
             pairs_list[1] < 0 and pairs_list[5] > 0, pairs_list[1] > 0 and pairs_list[5] < 0,
             pairs_list[2] < 0 and pairs_list[6] > 0, pairs_list[2] > 0 and pairs_list[6] < 0,
             pairs_list[3] < 0 and pairs_list[7] > 0, pairs_list[3] > 0 and pairs_list[7] < 0]
         if any(comp_list):
-            ans[row][col] = 1
+            ans[row][col] = 1.0
+            print("{+,0,-}")
     return ans
-
-
-def zero_neighbor(i:int, col:int, row:int, img:np.ndarray):
-    pass
 
 
 """ 3.3
@@ -219,15 +220,16 @@ def edgeDetectionCanny(img: np.ndarray, thrs_1: float, thrs_2: float) -> (np.nda
     magnitude = magnitude / magnitude.max() * 255
 
     # quantize the gradient directions
-    quant_dir = np.zeros(directions.shape)
-    quant_dir = quantGradientDirections(quant_dir, directions)
+    # quant_dir = np.zeros(directions.shape)
+    # quant_dir = quantGradientDirections(quant_dir, directions)
 
     # perform non-maximum suppression
-    thin_edges = nonMaxSupression(magnitude, directions)  # or quant_dir ??
+    thin_edges = nonMaxSupression(magnitude, directions)
 
-    # find all edges
-    ans = np.zeros(img.shape)
-    # ans = hysteresis(ans)
+    thresh, weak, strong = threshold(thin_edges, thrs_2, thrs_1)
+
+    # find all edges - hysteresis
+    ans = hysteresis(thresh, weak, strong)
 
     return cv_sol, thin_edges
 
@@ -246,35 +248,82 @@ def quantGradientDirections(img: np.ndarray, directions:np.ndarray) -> np.ndarra
     return img
 
 
-def nonMaxSupression(img: np.ndarray, D : np.ndarray) -> np.ndarray:
-    Z = np.zeros(img.shape, dtype=np.int32)
-    D[D < 0] += 180
+def nonMaxSupression(img, D):
+    M, N = img.shape
+    Z = np.zeros((M, N), dtype=np.int32)
+    angle = D * 180. / np.pi
+    angle[angle < 0] += 180
 
-    for i in range(1, img.shape[0] - 1):
-        for j in range(1, img.shape[1] - 1):
-            q = 255
-            r = 255
+    for i in range(1, M - 1):
+        for j in range(1, N - 1):
+            try:
+                q = 255
+                r = 255
 
-            if (0 <= D[i, j] < 22.5) or (157.5 <= D[i, j] <= 180):
-                q = img[i, j + 1]
-                r = img[i, j - 1]
+                # angle 0
+                if (0 <= angle[i, j] < 22.5) or (157.5 <= angle[i, j] <= 180):
+                    q = img[i, j + 1]
+                    r = img[i, j - 1]
+                # angle 45
+                elif (22.5 <= angle[i, j] < 67.5):
+                    q = img[i + 1, j - 1]
+                    r = img[i - 1, j + 1]
+                # angle 90
+                elif (67.5 <= angle[i, j] < 112.5):
+                    q = img[i + 1, j]
+                    r = img[i - 1, j]
+                # angle 135
+                elif (112.5 <= angle[i, j] < 157.5):
+                    q = img[i - 1, j - 1]
+                    r = img[i + 1, j + 1]
 
-            elif (22.5 <= D[i, j] < 67.5):
-                q = img[i + 1, j - 1]
-                r = img[i - 1, j + 1]
+                if (img[i, j] >= q) and (img[i, j] >= r):
+                    Z[i, j] = img[i, j]
+                else:
+                    Z[i, j] = 0
 
-            elif (67.5 <= D[i, j] < 112.5):
-                q = img[i + 1, j]
-                r = img[i - 1, j]
+            except IndexError as e:
+                pass
 
-            elif (112.5 <= D[i, j] < 157.5):
-                q = img[i - 1, j - 1]
-                r = img[i + 1, j + 1]
+    return Z
 
-            if (img[i, j] >= q) and (img[i, j] >= r):
-                Z[i, j] = img[i, j]
 
-        return Z
+def threshold(img, lowThresholdRatio=0.05, highThresholdRatio=0.09):
+    highThreshold = img.max() * highThresholdRatio;
+    lowThreshold = highThreshold * lowThresholdRatio;
+
+    M, N = img.shape
+    res = np.zeros((M, N), dtype=np.int32)
+
+    weak = np.int32(25)
+    strong = np.int32(255)
+
+    strong_i, strong_j = np.where(img >= highThreshold)
+    zeros_i, zeros_j = np.where(img < lowThreshold)
+
+    weak_i, weak_j = np.where((img <= highThreshold) & (img >= lowThreshold))
+
+    res[strong_i, strong_j] = strong
+    res[weak_i, weak_j] = weak
+
+    return res, weak, strong
+
+
+def hysteresis(img, weak, strong=255):
+    M, N = img.shape
+    for i in range(1, M-1):
+        for j in range(1, N-1):
+            if (img[i,j] == weak):
+                try:
+                    if ((img[i+1, j-1] == strong) or (img[i+1, j] == strong) or (img[i+1, j+1] == strong)
+                        or (img[i, j-1] == strong) or (img[i, j+1] == strong)
+                        or (img[i-1, j-1] == strong) or (img[i-1, j] == strong) or (img[i-1, j+1] == strong)):
+                        img[i, j] = strong
+                    else:
+                        img[i, j] = 0
+                except IndexError as e:
+                    pass
+    return img
 
 
 """ 4
@@ -289,6 +338,7 @@ def houghCircle(img:np.ndarray, min_radius:float, max_radius:float) -> list:
     if min_radius <= 0 or max_radius <= 0 or min_radius >= max_radius:
         print("There is some problem with the given radius values")
         return []
+
     blur_img = cv2.GaussianBlur(img, (5, 5), 1)
     edged_img = cv2.Canny(blur_img, 75, 150)
     circles_list = list()  # the answer to return

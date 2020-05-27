@@ -42,6 +42,16 @@ def test_convDerivative():
     plt.show()
 
 
+def test_blurImage():
+    img = cv2.imread("beach.jpg", cv2.IMREAD_GRAYSCALE)
+    blur = blurImage2(img)
+    plt.gray()
+    plt.imshow(img)
+    plt.show()
+    plt.imshow(blur)
+    plt.show()
+
+
 def test_edgeDetectionSobel():
     img = cv2.imread("codeMonkey.jpeg", cv2.IMREAD_GRAYSCALE)
     their, mine = edgeDetectionSobel(img, 0.3)
@@ -60,6 +70,7 @@ def test_edgeDetectionSobel():
 
 def test_edgeDetectionZeroCrossingLOG():
     img = cv2.imread("boxman.jpg", cv2.IMREAD_GRAYSCALE)
+    img = img / 255.0
     plt.gray()
     plt.imshow(img)
     plt.show()
